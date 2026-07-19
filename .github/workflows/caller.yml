@@ -1,0 +1,30 @@
+name: Caller
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    uses: ./.github/workflows/reusable.yml
+
+    with:
+      node-version: "22"
+
+      app-name: "React-App"
+
+      environment: "Production"
+
+    secrets:
+      npm-token: ${{ secrets.NPM_TOKEN }}
+
+  print-output:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - name: Print Build Time
+        run: |
+          echo "${{ needs.build.outputs.build-time }}"

@@ -1,0 +1,54 @@
+name: Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+      app-name:
+        required: true
+        type: string
+
+      environment:
+        required: true
+        type: string
+
+    secrets:
+      npm-token:
+        required: true
+
+    outputs:
+      build-time:
+        value: ${{ jobs.build.outputs.build-time }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    outputs:
+      build-time: ${{ steps.time.outputs.time }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Show Inputs
+        run: |
+          echo "App = ${{ inputs.app-name }}"
+          echo "Environment = ${{ inputs.environment }}"
+
+      - name: Use Secret
+        run: |
+          echo "Token Length = ${#TOKEN}"
+        env:
+          TOKEN: ${{ secrets.npm-token }}
+
+      - name: Generate Output
+        id: time
+        run: |
+          echo "time=$(date)" >> "$GITHUB_OUTPUT"
